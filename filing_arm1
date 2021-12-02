@@ -1,0 +1,266 @@
+#include <LiquidCrystal.h>
+#include <Servo.h>
+// Creates an LCD object. Parameters: (rs, enable, d4, d5, d6, d7)
+LiquidCrystal lcd(13, 12, 11, 10, 9, 8);
+Servo myservo1;
+Servo myservo2;
+Servo myservo3;
+Servo myservo4;
+Servo myservo5;
+Servo myservo6;
+////////////////////start///////
+int st1=90;
+int st2=0;
+int st3=28;
+int st4=83;
+int st5=1;
+int st6=95;
+////////////////////red//////////
+int r2=54;
+////////////hold green/////////
+int hg1=164;
+int hg2=32;
+int hg3=58;
+int hg6=103;
+////////////put green///////
+int pg2=94;
+/////////hold blue////
+int hb1=42;
+int hb2=41;
+int hb3=80;
+int hb6=76;
+//////////////////put blue////////
+int pb2=79;
+/////////////////////////////////////
+int cup=0;
+int timer=1000;
+int pump=24;
+////////////control-from wifi/////
+int a=26;
+int h=28;
+int m=30;
+int d=32;
+int s=34;
+/////////////leds/////////
+int Red=14;
+int Green=15;
+int Blue=16;
+
+void setup() 
+{
+  myservo1.attach(2);
+  myservo2.attach(3);
+  myservo3.attach(4);
+  myservo4.attach(5);
+  myservo5.attach(6);
+  myservo6.attach(7);
+  lcd.begin(16, 2);
+  lcd.clear();
+  pinMode(pump,OUTPUT);
+  pinMode(a,INPUT);
+  pinMode(h,INPUT);
+  pinMode(m,INPUT);
+  pinMode(d,INPUT);
+  pinMode(s,INPUT);
+  pinMode(Red,OUTPUT);
+  pinMode(Green,OUTPUT);
+  pinMode(Blue,OUTPUT);
+  digitalWrite(pump,HIGH);
+  digitalWrite(Red,LOW);
+  digitalWrite(Green,LOW);
+  digitalWrite(Blue,LOW);
+  lcd.setCursor(0, 0);
+  lcd.print("Filling Arm Project");
+  delay(1000);
+  lcd.clear();
+}
+
+void loop() 
+{ 
+  myservo1.write(st1);delay(10);
+  myservo2.write(st2);delay(10);
+  myservo3.write(st3);delay(10);
+  myservo4.write(st4);delay(10);
+  myservo5.write(st5);delay(10);
+  myservo6.write(st6);delay(10);
+//////////////
+int x=analogRead(A6);
+int z=analogRead(A7);
+int selct=analogRead(A8);
+
+if (x<=100)
+{cup=cup+1;
+if (cup>=3)
+{cup=3;}}
+if(x>=900)
+{cup=cup-1;
+if (cup<=0)
+{cup=0;}}
+/////////////wifi
+if (digitalRead(a)==HIGH)
+{cup=cup+1;
+if (cup>=3)
+{cup=3;}}
+if(digitalRead(h)==HIGH)
+{cup=cup-1;
+if (cup<=0)
+{cup=0;}}
+/////////////////////
+if(z>=900)
+{timer=timer+1000;
+if (timer>=8000)
+{timer=8000;}}
+if(z<=100)
+{timer=timer-1000;
+if (timer<=1000)
+{timer=1000;}}
+/////////////////wifi
+if(digitalRead(m)==HIGH)
+{timer=timer+1000;
+if (timer>=8000)
+{timer=8000;}}
+if(digitalRead(d)==HIGH)
+{timer=timer-1000;
+if (timer<=1000)
+{timer=1000;}}
+////////////////.
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Timer  ");
+  lcd.print(timer);
+  lcd.print(" ms");
+  lcd.setCursor(0, 1);
+  lcd.print("cup  ");
+  lcd.print(cup);
+  delay(300);
+
+  if (cup==1)
+  { 
+  if (selct<=10 || digitalRead(s)==HIGH)
+  { digitalWrite(Green,HIGH);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Start with Green Cup");
+    lcd.setCursor(0, 1);
+    lcd.print(timer);
+    lcd.print(" ms");
+    holdgreen();
+    delay(500);
+    pgreen();
+    delay(500);
+    digitalWrite(pump,LOW);
+    delay(timer);
+    digitalWrite(pump,HIGH);
+    rgreen();
+    delay(500); 
+    digitalWrite(Green,LOW);
+    cup=0;
+    timer=1000;
+  }}
+  /////////////
+  if (cup==2)
+  {
+  if (selct<=10 || digitalRead(s)==HIGH)
+   { 
+    digitalWrite(Red,HIGH);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Start with Red Cup");
+    lcd.setCursor(0, 1);
+    lcd.print(timer);
+    lcd.print(" ms");
+    red();
+    delay(500);
+    digitalWrite(pump,LOW);
+    delay(timer);
+    digitalWrite(pump,HIGH);
+    rred();
+    delay(500); 
+    digitalWrite(Red,LOW);
+    cup=0;
+    timer=1000;
+  }}
+  //////////////
+  if (cup==3)
+  {
+  if (selct<=10 || digitalRead(s)==HIGH)
+  { digitalWrite(Blue,HIGH);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Start with Blue Cup");
+    lcd.setCursor(0, 1);
+    lcd.print(timer);
+    lcd.print(" ms");
+    holdblue();
+    delay(500);
+    pblue();
+    delay(500);
+    digitalWrite(pump,LOW);
+    delay(timer);
+    digitalWrite(pump,HIGH);
+    rblue();
+    delay(500); 
+    digitalWrite(Blue,LOW);
+    cup=0;
+    timer=1000;
+  }} 
+} 
+void red()
+{   
+  for(int y2=st2; y2<=r2 ;y2++)
+  { myservo2.write(y2);delay(10);} 
+}
+void holdgreen()
+{   
+  for(int y6=st6; y6<=hg6 ;y6++)
+  { myservo6.write(y6);delay(10);} 
+  for(int y3=st3; y3<=hg3 ;y3++)
+  { myservo3.write(y3);delay(10);}
+  for(int y2=st2; y2<=hg2 ;y2++)
+  { myservo2.write(y2);delay(10);}
+  for(int y1=st1; y1<=hg1 ;y1++)
+  { myservo1.write(y1);delay(10);}
+}
+void holdblue()
+{   
+  for(int y6=st6; y6>=hb6 ;y6--)
+  { myservo6.write(y6);delay(10);} 
+  for(int y3=st3; y3<=hb3 ;y3++)
+  { myservo3.write(y3);delay(10);}
+  for(int y2=st2; y2<=hb2 ;y2++)
+  { myservo2.write(y2);delay(10);}
+  for(int y1=st1; y1>=hb1 ;y1--)
+  { myservo1.write(y1);delay(10);}
+}
+void pgreen()
+{   
+  for(int y2=hg2; y2<=pg2 ;y2++)
+  { myservo2.write(y2);delay(10);} 
+}
+void pblue()
+{   
+  for(int y2=hb2; y2<=pb2 ;y2++)
+  { myservo2.write(y2);delay(10);} 
+}
+void rgreen()
+{
+   for(int y2=pg2; y2>=hg2 ;y2--)
+  { myservo2.write(y2);delay(10);} 
+  for(int y1=hg1; y1<=st1 ;y1++)
+  { myservo1.write(y1);delay(10);} 
+  
+}
+void rblue()
+{
+   for(int y2=pb2; y2>=hb2 ;y2--)
+  { myservo2.write(y2);delay(10);} 
+  for(int y1=hb1; y1<=st1 ;y1++)
+  { myservo1.write(y1);delay(10);}
+}
+void rred()
+{
+   for(int y2=r2; y2>=st2 ;y2--)
+  { myservo2.write(y2);delay(10);} 
+}
+  
+
